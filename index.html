@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  Digital Preservation Simulator — OAIS Model
+  ============================================================
+  Author  : Jhon Alexander González Flórez
+  Web     : archivistadigital.com
+  Profile : Digital Archivist & Records Management Consultant
+  Standards: ISO 14721:2025 (OAIS) · ISO 16363 · PREMIS 3.0
+             ISO 19005 (PDF/A) · ISO 14533 · ISO 18492
+  Version : EN — International edition
+  ============================================================
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="Jhon Alexander González Flórez — Digital Archivist & Records Management Consultant">
+<meta name="description" content="Interactive simulator of the OAIS digital preservation model compliant with ISO 14721:2025, PREMIS 3.0, ISO 16363 and ISO 19005.">
+<title>Digital Preservation Simulator — OAIS Model · Jhon González</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap');
+
+:root {
+  --bg: #111318;
+  --surface: #1c1f26;
+  --surface2: #242830;
+  --surface3: #2c3038;
+  --border: #2e3340;
+  --border2: #3a4050;
+  --accent: #4ade80;
+  --accent-light: rgba(74,222,128,0.10);
+  --accent-mid: rgba(74,222,128,0.20);
+  --accent2: #fb923c;
+  --accent3: #a78bfa;
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --info: #38bdf8;
+  --text: #f0f2f5;
+  --text-body: #d8dce4;
+  --text-mid: #9aa0b0;
+  --text-dim: #636a7a;
+  --text-muted: #7a8090;
+  --glow: 0 0 18px rgba(74,222,128,0.22);
+  --shadow: 0 2px 12px rgba(0,0,0,0.35);
+  --shadow-md: 0 4px 24px rgba(0,0,0,0.45);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(74,222,128,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(74,222,128,0.04) 1px, transparent 1px);
+  background-size: 44px 44px;
+  pointer-events: none; z-index: 0;
+}
+
+.container { position: relative; z-index: 1; max-width: 1280px; margin: 0 auto; padding: 20px; }
+
+/* ─── HEADER ─── */
+header {
+  text-align: center;
+  padding: 48px 20px 36px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 28px;
+  position: relative;
+}
+header::after {
+  content: '';
+  position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%);
+  width: 260px; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+.header-badge {
+  display: inline-block;
+  background: var(--accent-light);
+  border: 1px solid rgba(74,222,128,0.35);
+  color: #4ade80;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem; letter-spacing: 3px;
+  padding: 5px 16px; border-radius: 2px;
+  margin-bottom: 18px; text-transform: uppercase; font-weight: 700;
+}
+header h1 {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: clamp(1.9rem, 4.5vw, 3rem);
+  font-weight: 700; letter-spacing: -0.5px; line-height: 1.08;
+  margin-bottom: 12px; color: var(--text);
+}
+header h1 em { font-style: normal; color: var(--accent); font-weight: 700; }
+header h1 span {
+  display: block;
+  font-family: 'IBM Plex Mono', monospace; font-weight: 400;
+  font-style: normal; font-size: 0.42em;
+  letter-spacing: 5px; text-transform: uppercase;
+  color: var(--text-dim); margin-top: 10px;
+}
+header p {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem; color: var(--text-mid);
+  letter-spacing: 1.2px; margin-bottom: 18px;
+}
+.header-author {
+  display: inline-flex; align-items: center; gap: 10px;
+  border-top: 1px solid var(--border); padding-top: 16px;
+  width: 100%; justify-content: center; margin-top: 4px;
+}
+.author-line { width: 32px; height: 1px; background: var(--border2); }
+.author-name { font-family: 'IBM Plex Sans', sans-serif; font-style: italic; font-weight: 400; font-size: 0.85rem; color: var(--text-mid); }
+.author-tag {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.54rem;
+  color: var(--accent); letter-spacing: 2px; text-transform: uppercase;
+  background: var(--accent-light); border: 1px solid rgba(74,222,128,0.3);
+  padding: 2px 8px; border-radius: 2px;
+}
+
+/* ─── TABS ─── */
+.tabs-nav {
+  display: flex; gap: 4px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px; margin-bottom: 20px;
+  overflow-x: auto;
+}
+.tab-btn {
+  flex: 1; min-width: 120px;
+  background: transparent; border: 1px solid transparent;
+  border-radius: 5px; padding: 10px 14px;
+  font-family: 'IBM Plex Sans', sans-serif; font-weight: 600;
+  font-size: 0.72rem; color: var(--text-dim);
+  cursor: pointer; transition: all 0.22s;
+  white-space: nowrap; text-align: center;
+}
+.tab-btn:hover { background: var(--surface3); color: var(--text-mid); }
+.tab-btn.active {
+  background: var(--surface2);
+  border-color: var(--border2);
+  color: var(--accent);
+  box-shadow: var(--shadow);
+}
+.tab-btn .tab-icon { display: block; font-size: 1.1rem; margin-bottom: 3px; }
+.tab-btn .tab-label { display: block; font-size: 0.58rem; letter-spacing: 1px; text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; }
+
+.tab-pane { display: none; animation: fadeUp 0.3s ease; }
+.tab-pane.active { display: block; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ─── PANELS ─── */
+.panel {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; overflow: hidden; margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+.panel-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 16px;
+  background: var(--surface2); border-bottom: 1px solid var(--border);
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--text-mid);
+}
+.panel-header .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+.panel-body { padding: 20px; }
+
+/* ─── OAIS DIAGRAM ─── */
+.oais-diagram { display: flex; flex-direction: column; gap: 10px; padding: 20px; }
+.oais-row { display: grid; gap: 10px; }
+.oais-row.r3 { grid-template-columns: repeat(3, 1fr); }
+
+.oais-entity {
+  border: 1.5px solid var(--border); border-radius: 6px; padding: 16px 14px;
+  cursor: pointer; transition: all 0.22s;
+  background: var(--surface2); text-align: center; position: relative; overflow: hidden;
+}
+.oais-entity::before {
+  content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(74,222,128,0.06), transparent);
+  transition: left 0.5s;
+}
+.oais-entity:hover::before { left: 100%; }
+.oais-entity:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: var(--glow); }
+.oais-entity.selected { border-color: var(--accent); background: var(--accent-light); box-shadow: var(--glow); }
+
+.entity-icon { font-size: 1.6rem; display: block; margin-bottom: 6px; }
+.entity-name { font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 0.82rem; color: var(--text); margin-bottom: 3px; }
+.entity-sub { font-family: 'IBM Plex Mono', monospace; font-size: 0.56rem; color: var(--text-mid); line-height: 1.5; }
+.entity-level {
+  display: inline-block; margin-top: 6px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.5rem;
+  padding: 2px 7px; border-radius: 2px; border: 1px solid;
+}
+.entity-level.n0 { color: var(--danger); border-color: var(--danger); background: rgba(248,113,113,0.08); }
+.entity-level.n1 { color: var(--warning); border-color: var(--warning); background: rgba(251,191,36,0.08); }
+.entity-level.n2 { color: #e2b93d; border-color: #e2b93d; background: rgba(226,185,61,0.08); }
+.entity-level.n3 { color: var(--info); border-color: var(--info); background: rgba(56,189,248,0.08); }
+.entity-level.n4 { color: var(--accent); border-color: var(--accent); background: var(--accent-light); }
+.entity-level.n5 { color: var(--success); border-color: var(--success); background: rgba(74,222,128,0.08); }
+
+.entity-detail {
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 6px; padding: 18px 20px; margin: 0 20px 20px;
+  display: none; animation: fadeUp 0.25s ease;
+}
+.entity-detail.show { display: block; }
+.entity-detail h3 { font-family: 'IBM Plex Sans', sans-serif; font-size: 0.95rem; font-weight: 700; margin-bottom: 10px; color: var(--text); }
+.entity-detail .criteria-list { list-style: none; }
+.entity-detail .criteria-list li {
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 0.78rem; color: var(--text-body);
+  padding: 7px 0; border-bottom: 1px solid var(--border);
+  display: flex; gap: 8px; align-items: flex-start; line-height: 1.55;
+}
+.entity-detail .criteria-list li:last-child { border-bottom: none; }
+.crit-icon { flex-shrink: 0; }
+
+/* ─── PACKAGES FLOW ─── */
+.pkg-flow { display: flex; align-items: center; justify-content: center; gap: 0; padding: 24px 20px; flex-wrap: wrap; }
+.pkg-actor { text-align: center; flex-shrink: 0; min-width: 90px; }
+.pkg-actor-icon { width: 56px; height: 56px; border-radius: 50%; border: 2px solid var(--border); background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin: 0 auto 6px; }
+.pkg-actor-name { font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem; color: var(--text-dim); }
+.pkg-arrow-wrap { display: flex; flex-direction: column; align-items: center; min-width: 100px; }
+.pkg-box {
+  background: var(--accent-light); border: 1.5px solid rgba(74,222,128,0.35);
+  border-radius: 4px; padding: 6px 12px; font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.58rem; color: var(--accent); font-weight: 700;
+  letter-spacing: 1px; text-align: center; margin-bottom: 4px; cursor: pointer; transition: all 0.2s;
+}
+.pkg-box:hover { background: var(--accent-mid); transform: scale(1.04); }
+.pkg-box.pit { background: rgba(167,139,250,0.1); border-color: rgba(167,139,250,0.4); color: var(--accent3); }
+.pkg-box.pia { background: var(--accent-light); border-color: rgba(74,222,128,0.4); color: var(--accent); }
+.pkg-box.pid { background: rgba(251,146,60,0.1); border-color: rgba(251,146,60,0.4); color: var(--accent2); }
+.pkg-line { width: 60px; height: 2px; background: var(--border2); position: relative; }
+.pkg-line::after { content: '▶'; position: absolute; right: -8px; top: -7px; font-size: 0.7rem; color: var(--text-dim); }
+
+/* ─── FORMS & CONTROLS ─── */
+.config-label {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--text-mid); margin-bottom: 8px;
+}
+.form-row { margin-bottom: 12px; }
+.styled-select {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 4px; color: var(--text-body);
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 0.72rem;
+  padding: 8px 10px; cursor: pointer; outline: none;
+}
+.styled-select:focus { border-color: var(--accent); }
+.styled-select option { background: var(--surface2); }
+.toggle-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.toggle-label { font-family: 'IBM Plex Sans', sans-serif; font-size: 0.75rem; color: var(--text-body); }
+.toggle { position: relative; width: 36px; height: 18px; cursor: pointer; }
+.toggle input { display: none; }
+.toggle-track { position: absolute; inset: 0; background: var(--border2); border-radius: 9px; transition: 0.2s; }
+.toggle input:checked + .toggle-track { background: var(--accent); }
+.toggle-thumb { position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: white; transition: 0.2s; }
+.toggle input:checked ~ .toggle-thumb { left: 20px; }
+.run-btn {
+  width: 100%; background: var(--accent); color: #0a0f0a;
+  border: none; border-radius: 4px;
+  font-family: 'IBM Plex Sans', sans-serif; font-weight: 700;
+  font-size: 0.82rem; letter-spacing: 0.5px; padding: 11px;
+  cursor: pointer; transition: all 0.2s; text-transform: uppercase; margin-top: 12px;
+}
+.run-btn:hover { box-shadow: var(--glow); transform: translateY(-1px); }
+.run-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+.run-btn.secondary { background: transparent; border: 1.5px solid var(--accent); color: var(--accent); }
+.run-btn.secondary:hover { background: var(--accent-light); }
+
+/* ─── LOG ─── */
+.log-box {
+  background: #0d1017; border: 1px solid var(--border2); border-radius: 6px; padding: 14px 16px;
+  max-height: 280px; overflow-y: auto;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.63rem; color: #7a8898; line-height: 1.9;
+}
+.log-box::-webkit-scrollbar { width: 4px; }
+.log-box::-webkit-scrollbar-track { background: transparent; }
+.log-box::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+.log-entry { animation: slideLog 0.3s ease; }
+@keyframes slideLog { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: translateX(0); } }
+.log-entry.ok { color: #7ac87a; }
+.log-entry.warn { color: #e8c870; }
+.log-entry.err { color: #e87a6a; }
+.log-entry.info { color: #7ac8e8; }
+.log-entry.head { color: #c8e8a8; font-weight: 700; }
+
+/* ─── PROGRESS ─── */
+.progress-wrap { background: var(--border); border-radius: 2px; height: 5px; overflow: hidden; margin: 10px 0 5px; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #a78bfa); border-radius: 2px; width: 0%; transition: width 0.4s ease; }
+.progress-label { display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem; color: var(--text-dim); }
+
+/* ─── METRICS ─── */
+.metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 16px; }
+.metric-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 5px; padding: 14px; text-align: center; position: relative; overflow: hidden; }
+.metric-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--border2); transition: background 0.3s; }
+.metric-card.green::after { background: var(--success); }
+.metric-card.blue::after { background: var(--info); }
+.metric-card.orange::after { background: var(--accent2); }
+.metric-card.purple::after { background: var(--accent3); }
+.metric-val { font-family: 'IBM Plex Mono', monospace; font-size: 1.1rem; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+.metric-name { font-family: 'IBM Plex Mono', monospace; font-size: 0.5rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+
+/* ─── STRATEGIES ─── */
+.strategy-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 20px 20px; }
+.strategy-card { border: 1.5px solid var(--border); border-radius: 6px; padding: 16px; cursor: pointer; transition: all 0.2s; background: var(--surface2); }
+.strategy-card:hover { border-color: var(--accent); background: var(--accent-light); }
+.strategy-card.active { border-color: var(--accent); background: var(--accent-light); box-shadow: var(--glow); }
+.strategy-name { font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 0.9rem; margin-bottom: 6px; color: var(--text); }
+.strategy-desc { font-family: 'IBM Plex Sans', sans-serif; font-size: 0.76rem; color: var(--text-body); line-height: 1.55; margin-bottom: 8px; }
+.strategy-risk { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 0.52rem; padding: 2px 8px; border-radius: 2px; border: 1px solid; letter-spacing: 1px; }
+.risk-low  { color: var(--success); border-color: var(--success); background: rgba(74,222,128,0.08); }
+.risk-mid  { color: var(--warning); border-color: var(--warning); background: rgba(251,191,36,0.08); }
+.risk-high { color: var(--danger);  border-color: var(--danger);  background: rgba(248,113,113,0.08); }
+
+/* ─── IDP ─── */
+.idp-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 0 20px 20px; }
+.idp-card { border: 1px solid var(--border); border-radius: 5px; padding: 14px 10px; text-align: center; background: var(--surface2); transition: all 0.2s; cursor: pointer; }
+.idp-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+.idp-icon { font-size: 1.5rem; display: block; margin-bottom: 6px; }
+.idp-name { font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 0.76rem; color: var(--text); margin-bottom: 4px; }
+.idp-desc { font-family: 'IBM Plex Sans', sans-serif; font-size: 0.66rem; color: var(--text-mid); line-height: 1.45; }
+
+/* ─── TABLES ─── */
+.risk-table { width: 100%; border-collapse: collapse; font-size: 0.76rem; }
+.risk-table th { background: var(--surface2); border: 1px solid var(--border); padding: 9px 12px; text-align: left; font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem; letter-spacing: 1px; text-transform: uppercase; color: var(--text-mid); }
+.risk-table td { border: 1px solid var(--border); padding: 10px 12px; color: var(--text-body); vertical-align: top; line-height: 1.55; }
+.risk-table tr:hover td { background: var(--surface2); }
+.risk-pill { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 0.5rem; padding: 2px 7px; border-radius: 2px; border: 1px solid; font-weight: 700; letter-spacing: 1px; }
+.pill-high { color: var(--danger);  border-color: var(--danger);  background: rgba(248,113,113,0.08); }
+.pill-mid  { color: var(--warning); border-color: var(--warning); background: rgba(251,191,36,0.08); }
+.pill-low  { color: var(--success); border-color: var(--success); background: rgba(74,222,128,0.08); }
+
+/* ─── FORMATS ─── */
+.format-matrix { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 20px 20px; }
+.fmt-card { border: 1px solid var(--border); border-radius: 6px; padding: 14px; background: var(--surface2); position: relative; }
+.fmt-name { font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; color: var(--text); }
+.fmt-std  { font-family: 'IBM Plex Mono', monospace; font-size: 0.56rem; color: var(--accent); margin-bottom: 8px; }
+.fmt-use  { font-family: 'IBM Plex Sans', sans-serif; font-size: 0.73rem; color: var(--text-body); line-height: 1.5; margin-bottom: 8px; }
+.fmt-badge { position: absolute; top: 12px; right: 12px; font-family: 'IBM Plex Mono', monospace; font-size: 0.5rem; padding: 2px 7px; border-radius: 2px; border: 1px solid; }
+.badge-master { color: var(--success); border-color: var(--success); background: rgba(74,222,128,0.08); }
+.badge-access { color: var(--info);    border-color: var(--info);    background: rgba(56,189,248,0.08); }
+.badge-avoid  { color: var(--danger);  border-color: var(--danger);  background: rgba(248,113,113,0.08); }
+
+/* ─── ALERTS ─── */
+.alert-box { border-radius: 5px; padding: 12px 16px; margin: 0 20px 16px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.77rem; line-height: 1.6; border-left: 3px solid; display: none; }
+.alert-box.show { display: block; animation: fadeUp 0.3s ease; }
+.alert-box.success { background: rgba(74,222,128,0.07);  border-color: var(--success); color: #a7f3c8; }
+.alert-box.warn    { background: rgba(251,191,36,0.07);  border-color: var(--warning); color: #fde68a; }
+.alert-box.error   { background: rgba(248,113,113,0.07); border-color: var(--danger);  color: #fecaca; }
+.alert-box.info    { background: rgba(56,189,248,0.07);  border-color: var(--info);    color: #bae6fd; }
+.alert-title { font-weight: 700; margin-bottom: 5px; font-size: 0.82rem; }
+
+/* ─── INTEGRITY ─── */
+.integrity-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 20px 20px; }
+.int-card { border: 1px solid var(--border); border-radius: 5px; padding: 14px; background: var(--surface2); }
+.int-hash { font-family: 'IBM Plex Mono', monospace; font-size: 0.51rem; color: var(--text-dim); word-break: break-all; line-height: 1.7; margin-top: 6px; }
+.int-status { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; margin-top: 8px; font-weight: 700; }
+.int-ok   { color: var(--success); }
+.int-fail { color: var(--danger); }
+
+/* ─── SLIDER ─── */
+.slider-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.slider-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; color: var(--text-mid); width: 100px; flex-shrink: 0; }
+input[type="range"] { -webkit-appearance: none; flex: 1; height: 3px; background: var(--border2); border-radius: 2px; outline: none; cursor: pointer; }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); cursor: pointer; }
+.slider-val { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: var(--accent); width: 60px; text-align: right; flex-shrink: 0; }
+
+/* ─── STANDARDS ─── */
+.std-strip { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 16px; }
+.std-badge { font-family: 'IBM Plex Mono', monospace; font-size: 0.52rem; padding: 3px 8px; border-radius: 2px; letter-spacing: 1px; border: 1px solid; opacity: 0.35; transition: opacity 0.3s; }
+.std-badge.lit { opacity: 1; }
+.std-badge.s1 { color: var(--success); border-color: var(--success); }
+.std-badge.s2 { color: var(--accent3); border-color: var(--accent3); }
+.std-badge.s3 { color: var(--accent);  border-color: var(--accent); }
+.std-badge.s4 { color: var(--accent2); border-color: var(--accent2); }
+.std-badge.s5 { color: #f472b6; border-color: #f472b6; }
+.std-badge.s6 { color: var(--info);    border-color: var(--info); }
+
+.sim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.two-col  { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* ─── FOOTER ─── */
+footer { margin-top: 40px; padding: 20px 0 30px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.footer-author { display: flex; align-items: center; gap: 12px; }
+.footer-icon { width: 36px; height: 36px; border-radius: 50%; background: var(--accent-light); border: 1px solid rgba(74,222,128,0.35); display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+.footer-name { font-family: 'IBM Plex Sans', sans-serif; font-style: italic; font-size: 0.95rem; color: var(--text); font-weight: 600; }
+.footer-web  { font-family: 'IBM Plex Mono', monospace; font-size: 0.54rem; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; }
+.footer-stds { font-family: 'IBM Plex Mono', monospace; font-size: 0.52rem; color: var(--text-dim); letter-spacing: 1px; text-align: right; line-height: 1.8; }
+
+@media (max-width: 900px) {
+  .oais-row.r3 { grid-template-columns: 1fr 1fr; }
+  .idp-grid { grid-template-columns: repeat(3, 1fr); }
+  .format-matrix { grid-template-columns: repeat(2, 1fr); }
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+  .two-col { grid-template-columns: 1fr; }
+  .sim-grid { grid-template-columns: 1fr; }
+  .integrity-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+  .oais-row.r3 { grid-template-columns: 1fr; }
+  .strategy-grid { grid-template-columns: 1fr; }
+  .idp-grid { grid-template-columns: repeat(2, 1fr); }
+  .format-matrix { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- HEADER -->
+<header>
+  <div class="header-badge">ISO 14721:2025 · OAIS · PREMIS 3.0 · ISO 16363</div>
+  <h1>Digital <em>Preservation</em><span>Simulator · OAIS Model</span></h1>
+  <p>Functional entities · Information packages · Migration strategies · PDI metadata</p>
+  <div class="header-author">
+    <div class="author-line"></div>
+    <span class="author-name">Jhon González</span>
+    <span class="author-tag">Digital Archivist</span>
+    <div class="author-line"></div>
+  </div>
+</header>
+
+<!-- TABS -->
+<nav class="tabs-nav" role="tablist">
+  <button class="tab-btn active" onclick="showTab('oais',this)" role="tab">
+    <span class="tab-icon">🏛</span><span class="tab-label">OAIS Model</span>
+  </button>
+  <button class="tab-btn" onclick="showTab('paquetes',this)" role="tab">
+    <span class="tab-icon">📦</span><span class="tab-label">SIP · AIP · DIP</span>
+  </button>
+  <button class="tab-btn" onclick="showTab('ingesta',this)" role="tab">
+    <span class="tab-icon">📥</span><span class="tab-label">Ingest Simulator</span>
+  </button>
+  <button class="tab-btn" onclick="showTab('migracion',this)" role="tab">
+    <span class="tab-icon">🔄</span><span class="tab-label">Migration</span>
+  </button>
+  <button class="tab-btn" onclick="showTab('integridad',this)" role="tab">
+    <span class="tab-icon">🔐</span><span class="tab-label">Integrity & PREMIS</span>
+  </button>
+  <button class="tab-btn" onclick="showTab('riesgos',this)" role="tab">
+    <span class="tab-icon">⚠</span><span class="tab-label">Risk Matrix</span>
+  </button>
+</nav>
+
+<!-- ════════ TAB 1: OAIS MODEL ════════ -->
+<div class="tab-pane active" id="tab-oais">
+  <div class="panel">
+    <div class="panel-header"><span class="dot"></span> Six Functional Entities — ISO 14721:2025 Section 4.1</div>
+    <div style="padding:14px 20px 0;font-size:0.75rem;color:var(--text-mid);line-height:1.65;">
+      Click any entity to view its evaluation criteria and expected maturity level. The OAIS model is the international reference framework for any trustworthy digital repository — adopted identically by ISO, CCSDS, and national archives worldwide.
+    </div>
+    <div class="oais-diagram">
+      <div class="oais-row r3">
+        <div class="oais-entity" onclick="showEntity('ingesta')">
+          <span class="entity-icon">📥</span>
+          <div class="entity-name">Ingest</div>
+          <div class="entity-sub">Accepts SIPs from Producers<br>generates AIPs, ensures quality</div>
+          <span class="entity-level n3">LEVEL 3 — DEFINED</span>
+        </div>
+        <div class="oais-entity" onclick="showEntity('almacenamiento')">
+          <span class="entity-icon">🗄</span>
+          <div class="entity-name">Archival Storage</div>
+          <div class="entity-sub">Stores, maintains and retrieves<br>AIPs over the long term</div>
+          <span class="entity-level n4">LEVEL 4 — MANAGED</span>
+        </div>
+        <div class="oais-entity" onclick="showEntity('datos')">
+          <span class="entity-icon">🏷</span>
+          <div class="entity-name">Data Management</div>
+          <div class="entity-sub">Descriptive and administrative<br>metadata management</div>
+          <span class="entity-level n2">LEVEL 2 — REPEATABLE</span>
+        </div>
+      </div>
+      <div class="oais-row r3">
+        <div class="oais-entity" onclick="showEntity('administracion')">
+          <span class="entity-icon">⚙</span>
+          <div class="entity-name">Administration</div>
+          <div class="entity-sub">Policies, agreements, audits<br>and succession planning</div>
+          <span class="entity-level n2">LEVEL 2 — REPEATABLE</span>
+        </div>
+        <div class="oais-entity" onclick="showEntity('planificacion')">
+          <span class="entity-icon">🔭</span>
+          <div class="entity-name">Preservation Planning</div>
+          <div class="entity-sub">Technology watch<br>and migration planning</div>
+          <span class="entity-level n1">LEVEL 1 — INITIAL</span>
+        </div>
+        <div class="oais-entity" onclick="showEntity('acceso')">
+          <span class="entity-icon">🌐</span>
+          <div class="entity-name">Access</div>
+          <div class="entity-sub">DIPs, finding aids<br>Designated Community</div>
+          <span class="entity-level n3">LEVEL 3 — DEFINED</span>
+        </div>
+      </div>
+    </div>
+    <div class="entity-detail" id="entity-detail">
+      <h3 id="ed-title">—</h3>
+      <ul class="criteria-list" id="ed-criteria"></ul>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header"><span class="dot"></span> Mandatory OAIS Responsibilities — ISO 14721:2025 Section 3.1</div>
+    <div class="panel-body">
+      <table class="risk-table">
+        <thead><tr><th>#</th><th>Responsibility</th><th>Standard ref.</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Negotiate and accept appropriate information from Producers</td><td>ISO 14721 §3.1.1</td><td><span class="risk-pill pill-mid">Partial</span></td></tr>
+          <tr><td>2</td><td>Obtain sufficient control to ensure Long-Term Preservation</td><td>ISO 14721 §3.1.2</td><td><span class="risk-pill pill-low">Compliant</span></td></tr>
+          <tr><td>3</td><td>Determine and define the Designated Community and its Knowledge Base</td><td>ISO 14721 §3.1.3</td><td><span class="risk-pill pill-high">Non-compliant</span></td></tr>
+          <tr><td>4</td><td>Ensure that the information is Independently Understandable</td><td>ISO 14721 §3.1.4</td><td><span class="risk-pill pill-mid">Partial</span></td></tr>
+          <tr><td>5</td><td>Follow documented policies and procedures — no ad-hoc deletions</td><td>ISO 14721 §3.1.5</td><td><span class="risk-pill pill-mid">Partial</span></td></tr>
+          <tr><td>6</td><td>Make information available to the Designated Community with Authenticity evidence</td><td>ISO 14721 §3.1.6</td><td><span class="risk-pill pill-low">Compliant</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header"><span class="dot"></span> OAIS Maturity Scale — ISO 16363</div>
+    <div class="panel-body" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+      <div style="border:1px solid var(--border);border-radius:5px;padding:12px;">
+        <span class="entity-level n0" style="margin-bottom:6px;display:inline-block">LEVEL 0</span>
+        <div style="font-weight:700;font-size:0.78rem;margin-bottom:4px;color:var(--text)">Non-existent</div>
+        <div style="font-size:0.7rem;color:var(--text-mid);line-height:1.55">No related practice exists for this functional entity.</div>
+      </div>
+      <div style="border:1px solid var(--border);border-radius:5px;padding:12px;">
+        <span class="entity-level n1" style="margin-bottom:6px;display:inline-block">LEVEL 1</span>
+        <div style="font-weight:700;font-size:0.78rem;margin-bottom:4px;color:var(--text)">Initial</div>
+        <div style="font-size:0.7rem;color:var(--text-mid);line-height:1.55">Ad-hoc practices, no documentation or formal systematisation.</div>
+      </div>
+      <div style="border:1px solid var(--border);border-radius:5px;padding:12px;">
+        <span class="entity-level n2" style="margin-bottom:6px;display:inline-block">LEVEL 2</span>
+        <div style="font-weight:700;font-size:0.78rem;margin-bottom:4px;color:var(--text)">Repeatable</div>
+        <div style="font-size:0.7rem;color:var(--text-mid);line-height:1.55">Basic processes identified; inconsistent application across units.</div>
+      </div>
+      <div style="border:1px solid var(--border);border-radius:5px;padding:12px;">
+        <span class="entity-level n3" style="margin-bottom:6px;display:inline-block">LEVEL 3</span>
+        <div style="font-weight:700;font-size:0.78rem;margin-bottom:4px;color:var(--text)">Defined</div>
+        <div style="font-size:0.7rem;color:var(--text-mid);line-height:1.55">Documented processes, formal policies, systematic application.</div>
+      </div>
+      <div style="border:1px solid var(--border);border-radius:5px;padding:12px;">
+        <span class="entity-level n4" style="margin-bottom:6px;display:inline-block">LEVEL 4</span>
+        <div style="font-weight:700;font-size:0.78rem;margin-bottom:4px;color:var(--text)">Managed</div>
+        <div style="font-size:0.7rem;color:var(--text-mid);line-height:1.55">Performance metrics, continuous monitoring, controlled improvement.</div>
+      </div>
+      <div style="border:1px solid var(--border);border-radius:5px;padding:12px;">
+        <span class="entity-level n5" style="margin-bottom:6px;display:inline-block">LEVEL 5</span>
+        <div style="font-weight:700;font-size:0.78rem;margin-bottom:4px;color:var(--text)">Optimised</div>
+        <div style="font-size:0.7rem;color:var(--text-mid);line-height:1.55">Continuous improvement, external benchmarking, ISO 16363 certification.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ TAB 2: PACKAGES ════════ -->
+<div class="tab-pane" id="tab-paquetes">
+  <div class="panel">
+    <div class="panel-header"><span class="dot"></span> Information Package Flow — ISO 14721:2025 Section 2.2</div>
+    <div class="pkg-flow" id="pkgFlow">
+      <div class="pkg-actor">
+        <div class="pkg-actor-icon">🏢</div>
+        <div class="pkg-actor-name">PRODUCER</div>
+      </div>
+      <div class="pkg-arrow-wrap">
+        <div class="pkg-box pit" onclick="showPkg('pit')">SIP · PIT<br>Submission</div>
+        <div class="pkg-line"></div>
+      </div>
+      <div class="pkg-actor" style="min-width:220px;">
+        <div style="border:2px solid var(--accent);border-radius:8px;padding:16px;background:var(--accent-light);text-align:center;">
+          <div style="font-weight:800;font-size:0.85rem;color:var(--text);margin-bottom:4px;">🏛 OAIS</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:0.58rem;color:var(--text-dim);">Digital Repository</div>
+          <div class="pkg-box pia" style="margin:10px 0 0;cursor:pointer;" onclick="showPkg('pia')">AIP · PIA<br>Archive</div>
+        </div>
+      </div>
+      <div class="pkg-arrow-wrap">
+        <div class="pkg-line" style="transform:scaleX(-1)"></div>
+        <div class="pkg-box pid" onclick="showPkg('pid')">DIP · PID<br>Dissemination</div>
+      </div>
+      <div class="pkg-actor">
+        <div class="pkg-actor-icon">👤</div>
+        <div class="pkg-actor-name">CONSUMER</div>
+      </div>
+    </div>
+    <div class="alert-box info show" id="pkgAlert">
+      <div class="alert-title">📦 Click on a package to explore its components</div>
+      The three packages (SIP, AIP, DIP) are the backbone of the OAIS model. Each has a distinct structure, content, and purpose as defined in ISO 14721:2025 Section 2.2.
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header"><span class="dot"></span> Preservation Description Information (PDI) — 5 Mandatory Categories</div>
+    <div class="idp-grid">
+      <div class="idp-card" onclick="highlightIDP(this,'Provenance','History and origin of the Content Information. Answers: where does this digital object come from? Who created it? Under what institutional context?')">
+        <span class="idp-icon">📜</span>
+        <div class="idp-name">Provenance</div>
+        <div class="idp-desc">History and origin of the digital object</div>
+      </div>
+      <div class="idp-card" onclick="highlightIDP(this,'Reference','Unique and persistent identifiers: DOI, ARK, Handle, URN. Ensure the object is permanently and unambiguously locatable by the Designated Community.')">
+        <span class="idp-icon">🔖</span>
+        <div class="idp-name">Reference</div>
+        <div class="idp-desc">Unique and persistent identifiers</div>
+      </div>
+      <div class="idp-card" onclick="highlightIDP(this,'Fixity','Verification mechanisms: SHA-256 checksums, CRC, digital signatures. Enable detection of accidental or deliberate alteration over time. Required by PREMIS and ISO 14721.')">
+        <span class="idp-icon">🔐</span>
+        <div class="idp-name">Fixity</div>
+        <div class="idp-desc">Checksums, CRC, digital signatures</div>
+      </div>
+      <div class="idp-card" onclick="highlightIDP(this,'Context','Relationships of the object with other documents, processes and its creation environment. Essential for Independent Understandability required by ISO 14721 §3.1.4.')">
+        <span class="idp-icon">🕸</span>
+        <div class="idp-name">Context</div>
+        <div class="idp-desc">Relationships with other objects and processes</div>
+      </div>
+      <div class="idp-card" onclick="highlightIDP(this,'Access Rights','Legal restrictions, licences and conditions of use. Determines who can access, under what conditions and for what period, as per the repository access policy.')">
+        <span class="idp-icon">⚖</span>
+        <div class="idp-name">Access Rights</div>
+        <div class="idp-desc">Restrictions, licences and conditions</div>
+      </div>
+    </div>
+    <div class="alert-box" id="idpAlert" style="margin-top:0">
+      <div class="alert-title" id="idpTitle">—</div>
+      <div id="idpText"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header"><span class="dot"></span> Recommended formats by role — Preservation vs. Access</div>
+    <div class="format-matrix">
+      <div class="fmt-card"><span class="fmt-badge badge-master">MASTER</span><div class="fmt-name">TIFF</div><div class="fmt-std">ISO 12234 · FADGI · Metamorfoze</div><div class="fmt-use">Lossless raster image. Master format for digitisation projects. Preserves all pixel data without destructive compression.</div></div>
+      <div class="fmt-card"><span class="fmt-badge badge-master">MASTER · ACCESS</span><div class="fmt-name">PDF/A</div><div class="fmt-std">ISO 19005-1/2/3</div><div class="fmt-use">Self-contained, software-independent. International preservation standard for electronic records with legal and probative value.</div></div>
+      <div class="fmt-card"><span class="fmt-badge badge-master">PRESERVATION</span><div class="fmt-name">PDF/A-3</div><div class="fmt-std">ISO 19005-3</div><div class="fmt-use">Allows embedding native attachments inside PDF/A. Ideal for mixed records packages with XML, structured data, or hybrid files.</div></div>
+      <div class="fmt-card"><span class="fmt-badge badge-access">ACCESS</span><div class="fmt-name">JPEG2000</div><div class="fmt-std">ISO/IEC 15444</div><div class="fmt-use">Configurable lossy or lossless compression. Access derivatives for high-resolution image collections (libraries, archives, museums).</div></div>
+      <div class="fmt-card"><span class="fmt-badge badge-master">METADATA</span><div class="fmt-name">XML / PREMIS</div><div class="fmt-std">ISO 23081 · PREMIS 3.0</div><div class="fmt-use">Structured preservation metadata. Documents events, agents, rights and relationships of the digital object across its lifecycle.</div></div>
+      <div class="fmt-card"><span class="fmt-badge badge-avoid">AVOID</span><div class="fmt-name">JPEG / DOC / XLS</div><div class="fmt-std">No preservation standard</div><div class="fmt-use">Proprietary or lossy formats. Not suitable as preservation masters. Require immediate migration to open, standards-based formats.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ TAB 3: INGEST ════════ -->
+<div class="tab-pane" id="tab-ingesta">
+  <div class="panel">
+    <div class="panel-header"><span class="dot"></span> Ingest Simulator — Functional Entity 1 · ISO 14721</div>
+    <div class="panel-body">
+      <div class="sim-grid">
+        <div>
+          <div class="config-label" style="margin-bottom:10px">Configure SIP (Submission Information Package)</div>
+          <div class="form-row">
+            <div class="config-label">Digital object type</div>
+            <select class="styled-select" id="objType">
+              <option value="expediente">Electronic records package (XML + docs)</option>
+              <option value="imagen">Image collection (TIFF/JPEG)</option>
+              <option value="video">Audiovisual recording (MP4/MOV)</option>
+              <option value="email">Email messages (EML/PST)</option>
+              <option value="bd">Database export (SQL dump)</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="config-label">Object format</div>
+            <select class="styled-select" id="objFormat">
+              <option value="pdfa">PDF/A — ISO 19005 ✅</option>
+              <option value="tiff">TIFF — Image master ✅</option>
+              <option value="xml">Structured XML ✅</option>
+              <option value="docx">DOCX — Office ⚠</option>
+              <option value="jpeg">JPEG — Access only ⚠</option>
+              <option value="doc">DOC legacy ❌</option>
+            </select>
+          </div>
+          <div class="slider-row">
+            <span class="slider-label">No. of objects</span>
+            <input type="range" id="objCount" min="1" max="500" step="1" value="50" oninput="document.getElementById('objCountVal').textContent=this.value">
+            <span class="slider-val" id="objCountVal">50</span>
+          </div>
+          <div class="toggle-row"><span class="toggle-label">Submission Agreement signed</span><label class="toggle"><input type="checkbox" id="tAcuerdo" checked><span class="toggle-track"></span><span class="toggle-thumb"></span></label></div>
+          <div class="toggle-row"><span class="toggle-label">Quality assurance (QA) check</span><label class="toggle"><input type="checkbox" id="tQA" checked><span class="toggle-track"></span><span class="toggle-thumb"></span></label></div>
+          <div class="toggle-row"><span class="toggle-label">PREMIS metadata included</span><label class="toggle"><input type="checkbox" id="tPremis" checked><span class="toggle-track"></span><span class="toggle-thumb"></span></label></div>
+          <div class="toggle-row"><span class="toggle-label">SHA-256 checksum</span><label class="toggle"><input type="checkbox" id="tChecksum" checked><span class="toggle-track"></span><span class="toggle-thumb"></span></label></div>
+          <div class="toggle-row"><span class="toggle-label">Convert to preservation format</span><label class="toggle"><input type="checkbox" id="tConvert"><span class="toggle-track"></span><span class="toggle-thumb"></span></label></div>
+          <button class="run-btn" id="ingestaBtn" onclick="runIngesta()">▶ Start Ingest</button>
+        </div>
+        <div>
+          <div class="config-label" style="margin-bottom:10px">Process log — OAIS Ingest</div>
+          <div class="progress-wrap"><div class="progress-fill" id="ingestaProg"></div></div>
+          <div class="progress-label"><span id="ingestaLabel">Ready to start</span><span id="ingestaPct">0%</span></div>
+          <div class="log-box" id="ingestaLog" style="margin-top:10px;">
+            <div style="color:var(--text-dim);font-style:italic;">The log will appear here when the ingest process starts…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="alert-box" id="ingestaAlert"></div>
+    <div class="panel-header" style="border-top:1px solid var(--border)"><span class="dot"></span> Standards activated in this process</div>
+    <div class="std-strip">
+      <span class="std-badge s3" id="si-14721">ISO 14721 OAIS</span>
+      <span class="std-badge s1" id="si-19005">ISO 19005 PDF/A</span>
+      <span class="std-badge s5" id="si-premis">PREMIS 3.0</span>
+      <span class="std-badge s4" id="si-23081">ISO 23081</span>
+      <span class="std-badge s6" id="si-15489">ISO 15489</span>
+      <span class="std-badge s2" id="si-16363">ISO 16363</span>
+    </div>
+  </div>
+  <div class="panel" id="ingestaMetricsPanel" style="display:none">
+    <div class="panel-header"><span class="dot"></span> Generated AIP metrics</div>
+    <div class="metrics-grid">
+      <div class="metric-card green"><div class="metric-val" id="im-obj">—</div><div class="metric-name">Objects ingested</div></div>
+      <div class="metric-card blue"><div class="metric-val" id="im-aia">—</div><div class="metric-name">AIPs generated</div></div>
+      <div class="metric-card orange"><div class="metric-val" id="im-int">—</div><div class="metric-name">Integrity</div></div>
+      <div class="metric-card purple"><div class="metric-val" id="im-cal">—</div><div class="metric-name">OAIS quality</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ TAB 4: MIGRATION ════════ -->
+<div class="tab-pane" id="tab-migracion">
+  <div class="panel">
+    <div class="panel-header"><span class="dot"></span> Digital Migration Strategies — ISO 14721:2025 Section 5</div>
+    <div style="padding:14px 20px 10px;font-size:0.75rem;color:var(--text-mid);line-height:1.65;">
+      Select a strategy to explore its description, risk level and conditions of application. The wrong choice can compromise the authenticity of digital objects — a critical concern for legal and archival repositories.
+    </div>
+    <div class="strategy-grid">
+      <div class="strategy-card" id="str-refresh" onclick="selectStrategy('refresh',this)">
+        <div class="strategy-name">🔁 Refreshment</div>
+        <div class="strategy-desc">Replaces a storage media instance without altering any bits. The digital object remains bit-for-bit identical. Lowest risk migration type.</div>
+        <span class="strategy-risk risk-low">LOW RISK</span>
+      </div>
+      <div class="strategy-card" id="str-replica" onclick="selectStrategy('replica',this)">
+        <div class="strategy-name">📋 Replication</div>
+        <div class="strategy-desc">Exact copy of the AIP without any alteration. Implements the 3-2-1 rule: 3 copies, 2 different media types, 1 offsite location.</div>
+        <span class="strategy-risk risk-low">LOW RISK</span>
+      </div>
+      <div class="strategy-card" id="str-repack" onclick="selectStrategy('repack',this)">
+        <div class="strategy-name">📦 Repackaging</div>
+        <div class="strategy-desc">Alters the Packaging Information of the AIP without modifying the Content Information. Requires PREMIS event documentation.</div>
+        <span class="strategy-risk risk-mid">MEDIUM RISK</span>
+      </div>
+      <div class="strategy-card" id="str-transform" onclick="selectStrategy('transform',this)">
+        <div class="strategy-name">⚗ Transformation</div>
+        <div class="strategy-desc">Alters the Content Information or the PDI. Requires authenticity validation, exhaustive documentation and institutional approval.</div>
+        <span class="strategy-risk risk-high">HIGH RISK</span>
+      </div>
+    </div>
+    <div class="alert-box" id="stratAlert"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header"><span class="dot"></span> Format Migration Simulator</div>
+    <div class="panel-body">
+      <div class="sim-grid">
+        <div>
+          <div class="form-row">
+            <div class="config-label">Source format (obsolete)</div>
+            <select class="styled-select" id="fmtOrigen">
+              <option value="doc">DOC — Office 97-2003 ❌</option>
+              <option value="xls">XLS — Legacy Excel ❌</option>
+              <option value="ppt">PPT — Legacy PowerPoint ❌</option>
+              <option value="jpeg">JPEG — No metadata ⚠</option>
+              <option value="docx">DOCX — Office 2007+ ⚠</option>
+              <option value="tiff">TIFF — No risk ✅</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="config-label">Target format (preservation)</div>
+            <select class="styled-select" id="fmtDestino">
+              <option value="pdfa">PDF/A-1b — ISO 19005-1</option>
+              <option value="pdfa2">PDF/A-2u — ISO 19005-2</option>
+              <option value="pdfa3">PDF/A-3b — ISO 19005-3</option>
+              <option value="tiff">TIFF uncompressed</option>
+              <option value="xml">Structured XML</option>
+            </select>
+          </div>
+          <div class="slider-row">
+            <span class="slider-label">File volume</span>
+            <input type="range" id="migVol" min="10" max="5000" step="10" value="500" oninput="document.getElementById('migVolVal').textContent=parseInt(this.value).toLocaleString()">
+            <span class="slider-val" id="migVolVal">500</span>
+          </div>
+          <div class="toggle-row"><span class="toggle-label">Validate with JHOVE</span><label class="toggle"><input type="checkbox" id="mJhove" checked><span class="toggle-track"></span><span class="toggle-thumb"></span></label></div>
+          <div class="toggle-row"><span class="toggle-label">Generate post-migration checksums</span><label class="toggle"><input type="checkbox" id="mCheck" checked><span class="toggle-track"></span><span class="toggle-thumb"></span></label></div>
+          <div class="toggle-row"><span class="toggle-label">Record PREMIS migration event</span><label class="toggle"><input type="checkbox" id="mPremis" checked><span class="toggle-track"></span><span class="toggle-thumb"></span></label></div>
+          <button class="run-btn" id="migBtn" onclick="runMigracion()">▶ Run Migration</button>
+        </div>
+        <div>
+          <div class="config-label" style="margin-bottom:10px">Migration log</div>
+          <div class="progress-wrap"><div class="progress-fill" id="migProg"></div></div>
+          <div class="progress-label"><span id="migLabel">Ready to migrate</span><span id="migPct">0%</span></div>
+          <div class="log-box" id="migLog" style="margin-top:10px;">
+            <div style="color:var(--text-dim);font-style:italic;">The migration log will appear here…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="alert-box" id="migAlert"></div>
+  </div>
+</div>
+
+<!-- ════════ TAB 5: INTEGRITY ════════ -->
+<div class="tab-pane" id="tab-integridad">
+  <div class="panel">
+    <div class="panel-header"><span class="dot"></span> Integrity Verification — Checksums & PREMIS</div>
+    <div style="padding:14px 20px 4px;font-size:0.75rem;color:var(--text-mid);line-height:1.65;">
+      Fixity is one of the 5 mandatory PDI categories (ISO 14721:2025). Without periodic checksum verification, no repository can guarantee the authenticity of its objects. This is a core requirement for ISO 16363 certification.
+    </div>
+    <div class="integrity-grid" id="integrityGrid"></div>
+    <div style="padding:0 20px 16px;display:flex;gap:10px;">
+      <button class="run-btn" onclick="runIntegrityCheck()" style="max-width:220px;">🔍 Verify Integrity</button>
+      <button class="run-btn secondary" onclick="generatePREMIS()" style="max-width:220px;">📋 Generate PREMIS event</button>
+    </div>
+    <div class="alert-box" id="intAlert"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header"><span class="dot"></span> Generated PREMIS event</div>
+    <div class="panel-body">
+      <div class="log-box" id="premisLog" style="min-height:160px;">
+        <div style="color:var(--text-dim);font-style:italic;">Click "Generate PREMIS event" to see the resulting XML…</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="panel">
+      <div class="panel-header"><span class="dot"></span> The 3-2-1 backup rule</div>
+      <div class="panel-body">
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="border:1px solid var(--border);border-radius:5px;padding:12px;background:var(--surface2);">
+            <div style="font-weight:700;font-size:0.78rem;margin-bottom:4px;color:var(--text);">3 — Three copies of the object</div>
+            <div style="font-size:0.72rem;color:var(--text-mid);line-height:1.55;">1 production copy + 2 backup copies. No copy is "the original" — all are equal replicas.</div>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:5px;padding:12px;background:var(--surface2);">
+            <div style="font-weight:700;font-size:0.78rem;margin-bottom:4px;color:var(--text);">2 — Two different media types</div>
+            <div style="font-size:0.72rem;color:var(--text-mid);line-height:1.55;">Hard disk + magnetic tape, or on-premises server + cloud. Different manufacturers and technologies.</div>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:5px;padding:12px;background:var(--surface2);">
+            <div style="font-weight:700;font-size:0.78rem;margin-bottom:4px;color:var(--text);">1 — One copy offsite</div>
+            <div style="font-size:0.72rem;color:var(--text-mid);line-height:1.55;">Different geographic location. Protects against physical disasters: fire, flood, earthquake, theft.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header"><span class="dot"></span> Supported integrity algorithms</div>
+      <div class="panel-body">
+        <table class="risk-table">
+          <thead><tr><th>Algorithm</th><th>Length</th><th>Recommended use</th></tr></thead>
+          <tbody>
+            <tr><td><strong>SHA-256</strong></td><td>256 bits</td><td>Current standard for digital preservation. Recommended by PREMIS, OAIS, and Library of Congress.</td></tr>
+            <tr><td><strong>SHA-512</strong></td><td>512 bits</td><td>Higher security for critical collections. Used in ISO 16363-certified repositories worldwide.</td></tr>
+            <tr><td><strong>MD5</strong></td><td>128 bits</td><td>Legacy — acceptable for error detection only. Not suitable for security. Known collision vulnerabilities.</td></tr>
+            <tr><td><strong>CRC-32</strong></td><td>32 bits</td><td>Transmission error detection only. Insufficient for long-term preservation assurance.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ TAB 6: RISK MATRIX ════════ -->
+<div class="tab-pane" id="tab-riesgos">
+  <div class="panel">
+    <div class="panel-header"><span class="dot"></span> Digital Preservation Risk Matrix — ISO 21946</div>
+    <div class="panel-body">
+      <table class="risk-table">
+        <thead>
+          <tr><th>Risk</th><th>OAIS entity affected</th><th>Likelihood</th><th>Impact</th><th>Level</th><th>Mitigation</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Format obsolescence</strong><br><span style="font-family:'IBM Plex Mono',monospace;font-size:0.55rem;color:var(--text-dim)">Proprietary formats with no renderer</span></td>
+            <td>Preservation Planning · Archival Storage</td>
+            <td><span class="risk-pill pill-high">HIGH</span></td>
+            <td><span class="risk-pill pill-high">CRITICAL</span></td>
+            <td><span class="risk-pill pill-high">HIGH</span></td>
+            <td>Migrate to PDF/A, TIFF, XML. Continuous technology watch programme.</td>
+          </tr>
+          <tr>
+            <td><strong>Bit rot</strong><br><span style="font-family:'IBM Plex Mono',monospace;font-size:0.55rem;color:var(--text-dim)">Silent degradation on storage media</span></td>
+            <td>Archival Storage</td>
+            <td><span class="risk-pill pill-mid">MEDIUM</span></td>
+            <td><span class="risk-pill pill-high">CRITICAL</span></td>
+            <td><span class="risk-pill pill-high">HIGH</span></td>
+            <td>Periodic SHA-256 checksum verification. 3-2-1 backup rule strictly applied.</td>
+          </tr>
+          <tr>
+            <td><strong>Missing PDI metadata</strong><br><span style="font-family:'IBM Plex Mono',monospace;font-size:0.55rem;color:var(--text-dim)">Objects without context or provenance</span></td>
+            <td>Data Management · Ingest</td>
+            <td><span class="risk-pill pill-high">HIGH</span></td>
+            <td><span class="risk-pill pill-high">CRITICAL</span></td>
+            <td><span class="risk-pill pill-high">HIGH</span></td>
+            <td>Implement PREMIS + ISO 23081 metadata schema at ingest. Mandatory fields enforced.</td>
+          </tr>
+          <tr>
+            <td><strong>Hardware failure / disaster</strong><br><span style="font-family:'IBM Plex Mono',monospace;font-size:0.55rem;color:var(--text-dim)">Fire, flood, disk failure, power loss</span></td>
+            <td>Archival Storage · Administration</td>
+            <td><span class="risk-pill pill-mid">MEDIUM</span></td>
+            <td><span class="risk-pill pill-high">CRITICAL</span></td>
+            <td><span class="risk-pill pill-high">HIGH</span></td>
+            <td>Documented and tested BCP/DRP. Geographically distributed copies. Regular DR tests.</td>
+          </tr>
+          <tr>
+            <td><strong>No preservation policy</strong><br><span style="font-family:'IBM Plex Mono',monospace;font-size:0.55rem;color:var(--text-dim)">Ad-hoc decisions, no governance</span></td>
+            <td>Administration</td>
+            <td><span class="risk-pill pill-high">HIGH</span></td>
+            <td><span class="risk-pill pill-mid">MAJOR</span></td>
+            <td><span class="risk-pill pill-high">HIGH</span></td>
+            <td>Approve institutional preservation policy. Appoint formal preservation officer with defined role.</td>
+          </tr>
+          <tr>
+            <td><strong>Cyberattack / ransomware</strong><br><span style="font-family:'IBM Plex Mono',monospace;font-size:0.55rem;color:var(--text-dim)">Encryption or malicious destruction</span></td>
+            <td>Archival Storage · Administration</td>
+            <td><span class="risk-pill pill-mid">MEDIUM</span></td>
+            <td><span class="risk-pill pill-high">CRITICAL</span></td>
+            <td><span class="risk-pill pill-high">HIGH</span></td>
+            <td>ISO 27001 controls. Immutable offline backups. Network segmentation. Air-gap copies.</td>
+          </tr>
+          <tr>
+            <td><strong>Undefined Designated Community</strong><br><span style="font-family:'IBM Plex Mono',monospace;font-size:0.55rem;color:var(--text-dim)">No documented Knowledge Base</span></td>
+            <td>Access · Preservation Planning</td>
+            <td><span class="risk-pill pill-high">HIGH</span></td>
+            <td><span class="risk-pill pill-mid">MAJOR</span></td>
+            <td><span class="risk-pill pill-mid">MEDIUM</span></td>
+            <td>Define user profiles. Document Knowledge Base. Review periodically as community evolves.</td>
+          </tr>
+          <tr>
+            <td><strong>Loss of archival context</strong><br><span style="font-family:'IBM Plex Mono',monospace;font-size:0.55rem;color:var(--text-dim)">Images without relationship to process</span></td>
+            <td>Ingest · Data Management</td>
+            <td><span class="risk-pill pill-mid">MEDIUM</span></td>
+            <td><span class="risk-pill pill-mid">MAJOR</span></td>
+            <td><span class="risk-pill pill-mid">MEDIUM</span></td>
+            <td>Integrate digitisation with ERMS/EDMS. Mandatory context metadata at ingest.</td>
+          </tr>
+          <tr>
+            <td><strong>Single vendor dependency</strong><br><span style="font-family:'IBM Plex Mono',monospace;font-size:0.55rem;color:var(--text-dim)">Vendor lock-in (software or cloud)</span></td>
+            <td>Administration · Preservation Planning</td>
+            <td><span class="risk-pill pill-mid">MEDIUM</span></td>
+            <td><span class="risk-pill pill-mid">MAJOR</span></td>
+            <td><span class="risk-pill pill-mid">MEDIUM</span></td>
+            <td>Open formats mandatory. Exit clauses in contracts. Interoperability with E-ARK, BagIt, OAIS standards.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-author">
+    <div class="footer-icon">🗂</div>
+    <div>
+      <div class="footer-name">Jhon Alexander González Flórez</div>
+      <div class="footer-web">Digital Archivist & Records Management Consultant · archivistadigital.com · Colombia</div>
+    </div>
+  </div>
+  <div class="footer-stds">
+    ISO 14721:2025 (OAIS) · ISO 16363 · PREMIS 3.0 · ISO 19005 (PDF/A) · ISO 23081<br>
+    ERMS · Digital Preservation · Web Accessibility · Records Management
+  </div>
+</footer>
+
+</div><!-- /.container -->
+
+<script>
+// ── TABS ──
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── OAIS ENTITIES DATA ──
+const entityData = {
+  ingesta: {
+    title: '📥 Ingest — Functional Entity 1',
+    criteria: [
+      { icon: '📋', text: 'Are there formalised Submission Agreements with Producers? (ISO 14721 §4.1.1)' },
+      { icon: '✅', text: 'Are quality assurance (QA) checks performed on received SIPs before generating the AIP?' },
+      { icon: '🏷', text: 'Are normalised AIPs generated with complete PDI: provenance, reference, fixity, context, access rights?' },
+      { icon: '🔐', text: 'Are SHA-256 checksums calculated and recorded for each object during ingest?' },
+      { icon: '📊', text: 'Expected evidence: Documented ingest procedures, submission records, QA logs, AIP registry.' }
+    ]
+  },
+  almacenamiento: {
+    title: '🗄 Archival Storage — Functional Entity 2',
+    criteria: [
+      { icon: '💾', text: 'Is redundant storage in place? Is the 3-2-1 rule applied: 3 copies, 2 media, 1 offsite?' },
+      { icon: '🔍', text: 'Are periodic integrity verifications (checksums) performed to detect bit rot?' },
+      { icon: '📅', text: 'Is there a documented media refreshment plan to prevent hardware obsolescence?' },
+      { icon: '🚨', text: 'Is there a tested Business Continuity / Disaster Recovery Plan (BCP/DRP)?' },
+      { icon: '📊', text: 'Expected evidence: Backup policies, verification schedules, media inventories, DR test records.' }
+    ]
+  },
+  datos: {
+    title: '🏷 Data Management — Functional Entity 3',
+    criteria: [
+      { icon: '📐', text: 'Is there a documented and normalised metadata schema (PREMIS, Dublin Core, EAD, RDA, ISO 23081)?' },
+      { icon: '🔎', text: 'Is the catalogue or search system accessible and usable by the Designated Community?' },
+      { icon: '📜', text: 'Is the complete PDI recorded for each object: provenance, context, rights, reference, fixity?' },
+      { icon: '🔄', text: 'Are metadata updated with every preservation event (migration, fixity check, access)?' },
+      { icon: '📊', text: 'Expected evidence: Documented PREMIS schemas, cataloguing manuals, active search portal.' }
+    ]
+  },
+  administracion: {
+    title: '⚙ Administration — Functional Entity 4',
+    criteria: [
+      { icon: '📜', text: 'Is there a formally approved institutional digital preservation policy?' },
+      { icon: '👤', text: 'Is there a formally designated preservation officer with defined responsibilities?' },
+      { icon: '🔄', text: 'Is there a Succession Plan: what happens to objects if the institution transforms, merges or ceases?' },
+      { icon: '🔍', text: 'Are periodic audits of the repository conducted in accordance with ISO 16363?' },
+      { icon: '📊', text: 'Expected evidence: Institutional policy, audit reports, continuity plan, succession plan.' }
+    ]
+  },
+  planificacion: {
+    title: '🔭 Preservation Planning — Functional Entity 5',
+    criteria: [
+      { icon: '📡', text: 'Is technology obsolescence of formats, software and hardware systematically monitored?' },
+      { icon: '🗺', text: 'Are documented and regularly updated format migration plans in place?' },
+      { icon: '⚠', text: 'Are formal preservation risk assessments conducted (ISO 21946)?' },
+      { icon: '👥', text: 'Is the Knowledge Base of the Designated Community periodically re-evaluated?' },
+      { icon: '📊', text: 'Expected evidence: Technology watch records, current migration plans, risk assessment reports.' }
+    ]
+  },
+  acceso: {
+    title: '🌐 Access — Functional Entity 6',
+    criteria: [
+      { icon: '🔗', text: 'Are DIPs (Dissemination Information Packages) available to the defined Designated Community?' },
+      { icon: '🗂', text: 'Are Finding Aids available that allow objects to be located without knowing their internal ID?' },
+      { icon: '⚖', text: 'Are access rights, restrictions and conditions of use formally managed?' },
+      { icon: '✅', text: 'Can the repository deliver objects with authenticity evidence (unchanged since ingest)?' },
+      { icon: '📊', text: 'Expected evidence: Public access portal/catalogue, query records, documented access policy.' }
+    ]
+  }
+};
+
+function showEntity(id) {
+  document.querySelectorAll('.oais-entity').forEach(e => e.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  const d = entityData[id];
+  const det = document.getElementById('entity-detail');
+  document.getElementById('ed-title').textContent = d.title;
+  const ul = document.getElementById('ed-criteria');
+  ul.innerHTML = d.criteria.map(c => `<li><span class="crit-icon">${c.icon}</span>${c.text}</li>`).join('');
+  det.classList.add('show');
+  det.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ── PACKAGES ──
+const pkgData = {
+  pit: {
+    type: 'info',
+    title: '📦 SIP — Submission Information Package',
+    text: 'Sent by the Producer to the OAIS. Contains: digital objects in their original format, basic descriptive metadata, checksums calculated by the producer and, optionally, context documentation. The Submission Agreement defines its structure and minimum requirements. The repository validates the SIP before generating the AIP.'
+  },
+  pia: {
+    type: 'success',
+    title: '🏛 AIP — Archival Information Package',
+    text: 'The core of the OAIS repository. Generated during ingest from the SIP. Contains: normalised digital object (preservation format), complete PDI (provenance, reference, fixity, context, rights), PREMIS metadata for each event, assigned persistent identifier. The AIP is immutable: any change generates a new versioned AIP.'
+  },
+  pid: {
+    type: 'warn',
+    title: '📤 DIP — Dissemination Information Package',
+    text: 'Generated on demand for the Consumer from the AIP. May be an exact copy or an adapted derivative: lower resolution, different format, metadata subset. Does not alter the AIP. Includes authenticity evidence and, if applicable, an integrity certificate for the delivered object.'
+  }
+};
+
+function showPkg(id) {
+  const d = pkgData[id];
+  const box = document.getElementById('pkgAlert');
+  box.className = 'alert-box show ' + d.type;
+  box.innerHTML = `<div class="alert-title">${d.title}</div>${d.text}`;
+}
+
+// ── IDP ──
+function highlightIDP(el, title, text) {
+  document.querySelectorAll('.idp-card').forEach(c => c.style.borderColor = '');
+  el.style.borderColor = 'var(--accent)';
+  const box = document.getElementById('idpAlert');
+  document.getElementById('idpTitle').textContent = '🔖 PDI · ' + title;
+  document.getElementById('idpText').textContent = text;
+  box.className = 'alert-box show info';
+}
+
+// ── INGEST SIMULATOR ──
+let ingestaRunning = false;
+function runIngesta() {
+  if (ingestaRunning) return;
+  ingestaRunning = true;
+  const btn = document.getElementById('ingestaBtn');
+  btn.disabled = true; btn.textContent = '⏳ Processing…';
+
+  const format = document.getElementById('objFormat').value;
+  const count = parseInt(document.getElementById('objCount').value);
+  const hasAcuerdo = document.getElementById('tAcuerdo').checked;
+  const hasQA = document.getElementById('tQA').checked;
+  const hasPremis = document.getElementById('tPremis').checked;
+  const hasChecksum = document.getElementById('tChecksum').checked;
+  const hasConvert = document.getElementById('tConvert').checked;
+
+  const log = document.getElementById('ingestaLog');
+  log.innerHTML = '';
+  document.getElementById('ingestaAlert').className = 'alert-box';
+  document.getElementById('ingestaMetricsPanel').style.display = 'none';
+
+  ['si-14721','si-19005','si-premis','si-23081','si-15489','si-16363'].forEach(id => {
+    document.getElementById(id).classList.remove('lit');
+  });
+
+  const steps = [];
+  if (!hasAcuerdo) steps.push({ cls:'warn', txt:'⚠ WARNING: No Submission Agreement. SIP cannot be formally accepted per ISO 14721 §4.1.1' });
+  steps.push({ cls:'head', txt:'══ INGEST STARTED · ISO 14721:2025 ══' });
+  steps.push({ cls:'info', txt:`📋 SIP received: ${count} object(s) · Declared format: ${format.toUpperCase()}` });
+  steps.push({ cls:'info', txt:'🔍 Validating SIP structure…' });
+
+  if (hasQA) {
+    steps.push({ cls:'ok', txt:'✅ Quality assurance (QA) check started' });
+    steps.push({ cls:'ok', txt:`✅ ${count} object(s) validated · 0 rejected` });
+  } else {
+    steps.push({ cls:'warn', txt:'⚠ QA disabled — risk of accepting corrupt or incomplete objects' });
+  }
+
+  if (hasChecksum) {
+    steps.push({ cls:'ok', txt:`✅ SHA-256 checksums calculated for ${count} object(s)` });
+    document.getElementById('si-14721').classList.add('lit');
+  }
+
+  if (hasConvert || ['doc','xls','ppt','jpeg','docx'].includes(format)) {
+    if (['doc','xls','ppt'].includes(format)) {
+      steps.push({ cls:'warn', txt:`⚠ Format ${format.toUpperCase()} detected as OBSOLETE — initiating transformation to PDF/A` });
+    }
+    steps.push({ cls:'ok', txt:'🔄 Format transformation completed → PDF/A-2u (ISO 19005-2)' });
+    document.getElementById('si-19005').classList.add('lit');
+  }
+
+  if (hasPremis) {
+    steps.push({ cls:'ok', txt:'📋 PREMIS 3.0 metadata generated for each object' });
+    steps.push({ cls:'ok', txt:'📋 PREMIS "ingestion" event recorded with agent and timestamp' });
+    document.getElementById('si-premis').classList.add('lit');
+    document.getElementById('si-23081').classList.add('lit');
+  } else {
+    steps.push({ cls:'warn', txt:'⚠ No PREMIS metadata — incomplete PDI: critical risk for long-term preservation' });
+  }
+
+  steps.push({ cls:'info', txt:'📦 Generating AIP (Archival Information Package)…' });
+  steps.push({ cls:'ok', txt:`✅ ${count} AIPs generated with persistent identifiers (ARK)` });
+  steps.push({ cls:'info', txt:'💾 Storing AIPs in archival repository…' });
+  steps.push({ cls:'ok', txt:'✅ Storage confirmed · 3-2-1 rule applied' });
+
+  const quality = calcIngestaQuality(hasAcuerdo, hasQA, hasPremis, hasChecksum, format);
+  steps.push({ cls: quality.ok ? 'ok' : 'warn', txt: `══ INGEST COMPLETED · OAIS Quality: ${quality.label} (${quality.score}%) ══` });
+
+  document.getElementById('si-15489').classList.add('lit');
+  if (quality.score >= 85) document.getElementById('si-16363').classList.add('lit');
+
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i >= steps.length) {
+      clearInterval(interval);
+      finishIngesta(count, quality);
+      return;
+    }
+    const s = steps[i];
+    const el = document.createElement('div');
+    el.className = 'log-entry ' + s.cls;
+    el.textContent = s.txt;
+    log.appendChild(el);
+    log.scrollTop = log.scrollHeight;
+    const pct = Math.round(((i+1)/steps.length)*100);
+    document.getElementById('ingestaProg').style.width = pct + '%';
+    document.getElementById('ingestaPct').textContent = pct + '%';
+    document.getElementById('ingestaLabel').textContent = s.txt.replace(/[✅⚠📋📦💾🔍🔄══]/g,'').trim().substring(0,40) + '…';
+    i++;
+  }, 420);
+}
+
+function calcIngestaQuality(acuerdo, qa, premis, checksum, fmt) {
+  let s = 0;
+  if (acuerdo) s += 20;
+  if (qa) s += 20;
+  if (premis) s += 25;
+  if (checksum) s += 20;
+  if (['pdfa','tiff','xml'].includes(fmt)) s += 15; else if (fmt === 'docx') s += 8;
+  const label = s >= 90 ? '🏆 Optimal' : s >= 75 ? '✅ Good' : s >= 55 ? '⚠ Acceptable' : '❌ Deficient';
+  return { score: s, label, ok: s >= 75 };
+}
+
+function finishIngesta(count, quality) {
+  document.getElementById('ingestaMetricsPanel').style.display = 'block';
+  document.getElementById('im-obj').textContent = count.toLocaleString();
+  document.getElementById('im-aia').textContent = count.toLocaleString();
+  document.getElementById('im-int').textContent = document.getElementById('tChecksum').checked ? '100% SHA-256' : '⚠ Unverified';
+  document.getElementById('im-cal').textContent = quality.label;
+
+  const alert = document.getElementById('ingestaAlert');
+  if (quality.score >= 75) {
+    alert.className = 'alert-box show success';
+    alert.innerHTML = `<div class="alert-title">✅ Ingest compliant with ISO 14721:2025</div>All ${count} objects were ingested with archival quality ${quality.label}. The generated AIPs meet PDI requirements and are ready for long-term preservation.`;
+  } else {
+    alert.className = 'alert-box show error';
+    alert.innerHTML = `<div class="alert-title">❌ Ingest with critical gaps — Quality: ${quality.label}</div>Generated AIPs have incomplete PDI. Without PREMIS metadata, checksums and quality control, the repository cannot guarantee object authenticity over the long term (ISO 14721 §3.1.4).`;
+  }
+
+  const btn = document.getElementById('ingestaBtn');
+  btn.disabled = false; btn.textContent = '▶ New Ingest';
+  ingestaRunning = false;
+}
+
+// ── STRATEGY ──
+const stratData = {
+  refresh: { type:'success', title:'🔁 Refreshment — Low Risk', text:'Replaces the physical storage media instance (e.g. failing hard disk → new disk) without altering any bit of the object. The digital object remains bit-for-bit identical. Only requires recording the event in PREMIS as "replication". Apply before hardware reaches 80% of its estimated lifespan.' },
+  replica: { type:'info',    title:'📋 Replication — Low Risk', text:'Exact copy of the complete AIP on new media. Implements the 3-2-1 rule. Checksums of the original and replica must be identical — any difference indicates corruption. Record as PREMIS event "replication" with agent, date and verification checksum.' },
+  repack:  { type:'warn',    title:'📦 Repackaging — Medium Risk', text:'Alters the Packaging Information of the AIP: changes the container structure or updates wrapper metadata, without modifying the Content Information. Requires: documenting the change as PREMIS "migration" event, preserving the original AIP as a previous version, and validating that content remains unaltered (content checksum = identical).' },
+  transform: { type:'error', title:'⚗ Transformation — High Risk · Requires validation', text:'Alters the Content Information (the object itself) or the PDI. This is the highest-risk strategy because it may compromise authenticity. Apply only when unavoidable (obsolete formats with no existing renderers). Requires: formal institutional approval, preservation of original object as AIP v1, PREMIS "migration" event with technical justification, and certification that intellectual content is faithful to the original.' }
+};
+
+function selectStrategy(id, el) {
+  document.querySelectorAll('.strategy-card').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  const d = stratData[id];
+  const box = document.getElementById('stratAlert');
+  box.className = 'alert-box show ' + d.type;
+  box.innerHTML = `<div class="alert-title">${d.title}</div>${d.text}`;
+}
+
+// ── MIGRATION SIMULATOR ──
+let migRunning = false;
+function runMigracion() {
+  if (migRunning) return;
+  migRunning = true;
+  const btn = document.getElementById('migBtn');
+  btn.disabled = true; btn.textContent = '⏳ Migrating…';
+
+  const origen = document.getElementById('fmtOrigen').value;
+  const destino = document.getElementById('fmtDestino').value;
+  const vol = parseInt(document.getElementById('migVol').value);
+  const jhove = document.getElementById('mJhove').checked;
+  const check = document.getElementById('mCheck').checked;
+  const premis = document.getElementById('mPremis').checked;
+
+  const log = document.getElementById('migLog');
+  log.innerHTML = '';
+
+  const isRisky = ['doc','xls','ppt'].includes(origen);
+  const steps = [
+    { cls:'head', txt:'══ DIGITAL MIGRATION STARTED · ISO 14721:2025 §5 ══' },
+    { cls:'info', txt:`📊 Repository scanned: ${vol.toLocaleString()} file(s) in format ${origen.toUpperCase()}` },
+    { cls: isRisky ? 'warn':'ok', txt: isRisky ? `⚠ Format ${origen.toUpperCase()} classified as OBSOLETE — urgent migration recommended` : `✅ Format ${origen.toUpperCase()} at acceptable risk level` },
+    { cls:'info', txt:`🔄 Strategy selected: Transformation → ${destino.toUpperCase()}` },
+    { cls:'info', txt:`⚙ Processing batch 1: ${Math.min(vol,200).toLocaleString()} files…` },
+  ];
+  if (jhove) steps.push({ cls:'ok', txt:'✅ JHOVE validation: target formats verified against specifications' });
+  if (check) steps.push({ cls:'ok', txt:`✅ SHA-256 checksums generated for ${Math.min(vol,200)} migrated objects` });
+  if (premis) steps.push({ cls:'ok', txt:'📋 PREMIS "migration" event recorded: agent, justification, date, before/after checksums' });
+  if (vol > 200) steps.push({ cls:'info', txt:`⚙ Processing batch 2: ${(vol-200).toLocaleString()} remaining files…` });
+  if (jhove && vol > 200) steps.push({ cls:'ok', txt:`✅ Batch 2 validated with JHOVE: ${(vol-200).toLocaleString()}/${(vol-200).toLocaleString()} successful` });
+  steps.push({ cls:'ok', txt:`✅ Migration completed: ${vol.toLocaleString()} files → ${destino.toUpperCase()}` });
+  steps.push({ cls:'ok', txt:`📊 Success rate: ${premis && check ? '100%' : '97.2%'} · Estimated time: ${(vol*0.3/60).toFixed(1)} min` });
+  steps.push({ cls:'head', txt:'══ MIGRATION COMPLETE ══' });
+
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i >= steps.length) {
+      clearInterval(interval);
+      const alert = document.getElementById('migAlert');
+      if (premis && check && jhove) {
+        alert.className = 'alert-box show success';
+        alert.innerHTML = `<div class="alert-title">✅ Migration compliant with ISO 14721:2025</div>All ${vol.toLocaleString()} objects were migrated with full traceability: checksums, JHOVE validation and PREMIS event recorded. Original AIPs preserved as previous version.`;
+      } else {
+        alert.className = 'alert-box show warn';
+        alert.innerHTML = `<div class="alert-title">⚠ Incomplete migration — limited traceability</div>Without ${!premis?'PREMIS event, ':''}${!check?'post-migration checksums, ':''}${!jhove?'JHOVE validation, ':''}it is not possible to certify the authenticity of migrated objects per ISO 14721.`;
+      }
+      btn.disabled = false; btn.textContent = '▶ Run Migration';
+      migRunning = false;
+      return;
+    }
+    const s = steps[i];
+    const el = document.createElement('div');
+    el.className = 'log-entry ' + s.cls;
+    el.textContent = s.txt;
+    log.appendChild(el);
+    log.scrollTop = log.scrollHeight;
+    const pct = Math.round(((i+1)/steps.length)*100);
+    document.getElementById('migProg').style.width = pct + '%';
+    document.getElementById('migPct').textContent = pct + '%';
+    document.getElementById('migLabel').textContent = s.txt.replace(/[✅⚠📋📦💾🔍🔄══⚙📊]/g,'').trim().substring(0,42) + '…';
+    i++;
+  }, 380);
+}
+
+// ── INTEGRITY ──
+const sampleObjects = [
+  { name:'RECORDS-PKG-2024-001245.xml', sha:'a3f8e9c12d4b7f6e5a2c9d0b3e7f1a4c8d2e5b9f3a6c0d4e7b8a1f5c2d9e6b0', ok: true },
+  { name:'ADMIN-ACT-0234-2024.pdf',     sha:'b7c3a5f0e2d8b1a4c6e9f3d5b8a2c7e0f4b6a1d3e5c8b9f2a0d7e4c1b3f6a8e', ok: true },
+  { name:'CONTRACT-0891-2024.pdfa',     sha:'e1f4b7c9a2d5e8f0b3c6a9d2e5f8b1c4a7d0e3f6b9c2a5d8e1f4b7c0a3d6e9f', ok: false },
+  { name:'CIRCULAR-012-2024.tiff',      sha:'f2a5d8e0b3c6f9a2e5b8d1c4f7a0d3e6b9c2f5a8d1e4b7c0f3a6d9e2b5c8f1', ok: true },
+  { name:'RESOLUTION-445-2024.xml',     sha:'c4d7f0a2e5b8c1f4a7d0e3f6b9c2a5d8e1f4b7c0a3d6e9f2b5c8f1a4d7e0b3', ok: true },
+  { name:'TECHNICAL-REPORT-Q3.pdf',     sha:'d6e9b1f4a7c0d3e6f9b2c5a8d1e4b7f0c3a6d9e2b5c8f1a4d7e0b3c6f9a2e5', ok: true },
+];
+
+function buildIntegrityGrid() {
+  const grid = document.getElementById('integrityGrid');
+  grid.innerHTML = sampleObjects.map(o => `
+    <div class="int-card">
+      <div style="font-weight:700;font-size:0.75rem;color:var(--text);margin-bottom:2px;">📄 ${o.name}</div>
+      <div class="int-hash">SHA-256:<br>${o.sha}</div>
+      <div class="int-status" id="int-${o.name.replace(/\./g,'_')}">⏳ Pending verification</div>
+    </div>`).join('');
+}
+
+function runIntegrityCheck() {
+  let delay = 0;
+  let failed = 0;
+  sampleObjects.forEach(o => {
+    setTimeout(() => {
+      const el = document.getElementById('int-' + o.name.replace(/\./g,'_'));
+      if (el) {
+        el.textContent = o.ok ? '✅ Intact — SHA-256 verified' : '❌ ERROR — Checksum mismatch · Possible corruption';
+        el.className = 'int-status ' + (o.ok ? 'int-ok':'int-fail');
+        if (!o.ok) failed++;
+      }
+    }, delay);
+    delay += 300;
+  });
+
+  setTimeout(() => {
+    const alert = document.getElementById('intAlert');
+    if (failed === 0) {
+      alert.className = 'alert-box show success';
+      alert.innerHTML = `<div class="alert-title">✅ Integrity verification completed</div>${sampleObjects.length} objects verified · 0 errors detected. SHA-256 checksums match AIP records. Repository integrity confirmed.`;
+    } else {
+      alert.className = 'alert-box show error';
+      alert.innerHTML = `<div class="alert-title">❌ ${failed} object(s) with integrity failure</div>Checksums do not match AIP records. This indicates bit rot or possible unauthorised manipulation. Activate recovery protocol from replica immediately.`;
+    }
+  }, delay + 200);
+}
+
+function generatePREMIS() {
+  const log = document.getElementById('premisLog');
+  const now = new Date().toISOString();
+  log.innerHTML = `<div class="log-entry head">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</div>
+<div class="log-entry info">&lt;premis:premis xmlns:premis="http://www.loc.gov/premis/v3"&gt;</div>
+<div class="log-entry ok">  &lt;premis:event&gt;</div>
+<div class="log-entry ok">    &lt;premis:eventIdentifier&gt;</div>
+<div class="log-entry ok">      &lt;premis:eventIdentifierType&gt;UUID&lt;/premis:eventIdentifierType&gt;</div>
+<div class="log-entry ok">      &lt;premis:eventIdentifierValue&gt;${crypto.randomUUID ? crypto.randomUUID() : 'evt-'+Date.now()}&lt;/premis:eventIdentifierValue&gt;</div>
+<div class="log-entry ok">    &lt;/premis:eventIdentifier&gt;</div>
+<div class="log-entry ok">    &lt;premis:eventType&gt;fixity check&lt;/premis:eventType&gt;</div>
+<div class="log-entry ok">    &lt;premis:eventDateTime&gt;${now}&lt;/premis:eventDateTime&gt;</div>
+<div class="log-entry ok">    &lt;premis:eventDetail&gt;SHA-256 fixity verification per ISO 14721:2025&lt;/premis:eventDetail&gt;</div>
+<div class="log-entry warn">    &lt;premis:eventOutcomeInformation&gt;</div>
+<div class="log-entry warn">      &lt;premis:eventOutcome&gt;success&lt;/premis:eventOutcome&gt;</div>
+<div class="log-entry warn">      &lt;premis:eventOutcomeDetail&gt;</div>
+<div class="log-entry warn">        &lt;premis:eventOutcomeDetailNote&gt;5 objects verified / 0 errors&lt;/premis:eventOutcomeDetailNote&gt;</div>
+<div class="log-entry warn">      &lt;/premis:eventOutcomeDetail&gt;</div>
+<div class="log-entry warn">    &lt;/premis:eventOutcomeInformation&gt;</div>
+<div class="log-entry info">    &lt;premis:linkingAgentIdentifier&gt;</div>
+<div class="log-entry info">      &lt;premis:linkingAgentIdentifierType&gt;local&lt;/premis:linkingAgentIdentifierType&gt;</div>
+<div class="log-entry info">      &lt;premis:linkingAgentIdentifierValue&gt;oais-repository-v2&lt;/premis:linkingAgentIdentifierValue&gt;</div>
+<div class="log-entry info">    &lt;/premis:linkingAgentIdentifier&gt;</div>
+<div class="log-entry ok">  &lt;/premis:event&gt;</div>
+<div class="log-entry info">&lt;/premis:premis&gt;</div>`;
+}
+
+// ── INIT ──
+buildIntegrityGrid();
+</script>
+</body>
+</html>
